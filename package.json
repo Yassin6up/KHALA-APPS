@@ -1,0 +1,21 @@
+{
+  "name": "khala-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "KHALA — multi-app backend (Node/MySQL) + Qader Arabic app + Admin",
+  "workspaces": [
+    "packages/*",
+    "api",
+    "admin"
+  ],
+  "scripts": {
+    "api:dev": "npm --workspace api run start:dev",
+    "api:db": "npm --workspace api run prisma:generate && npm --workspace api run prisma:migrate",
+    "admin:dev": "npm --workspace admin run dev",
+    "app:start": "cd app-qader && npm run start",
+    "build:shared": "npm --workspace @khala/shared run build"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

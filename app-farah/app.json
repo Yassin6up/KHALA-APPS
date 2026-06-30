@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "فرح AI",
+    "slug": "farah",
+    "scheme": "farah",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#FFF7FB",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.khala.farah",
+      "usesAppleSignIn": true,
+      "infoPlist": { "CFBundleAllowMixedLocalizations": true }
+    },
+    "android": {
+      "package": "com.khala.farah",
+      "adaptiveIcon": {
+        "backgroundColor": "#FFF7FB"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "extra": {
+      "apiUrl": "http://localhost:4000/v1",
+      "appKey": "farah"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-apple-authentication",
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

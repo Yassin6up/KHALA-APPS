@@ -1,0 +1,588 @@
+// KHALA multi-app data model (MySQL 8).
+// Shared identity (users) + per-app scoping via appId on every app-scoped table.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------------------------------
+// Platform / tenancy
+// ----------------------------------------------------------------------------
+model AdminUser {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  role         String    @default("admin") // super_admin | admin | viewer
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@map("admin_users")
+}
+
+model App {
+  id        String   @id @default(cuid())
+  key       String   @unique // "qader", "afia"
+  nameAr    String
+  nameEn    String
+  status    String   @default("active")
+  themeJson Json?
+  createdAt DateTime @default(now())
+
+  apiKeys       AppApiKey[]
+  memberships   AppMembership[]
+  plans         Plan[]
+  subscriptions Subscription[]
+  payments      Payment[]
+  entitlements  Entitlement[]
+  referralCodes ReferralCode[]
+  catalogItems  CatalogItem[]
+  bookings      Booking[]
+  libraryAssets  LibraryAsset[]
+  coaches        Coach[]
+  notifications  Notification[]
+  assessments   Assessment[]
+  devPlans      DevPlan[]
+  challenges    Challenge[]
+  dailyTasks    DailyTask[]
+  consults      ConsultSession[]
+  rooms         Room[]
+  messages      Message[]
+  pointsLedger  PointsLedger[]
+  badges        Badge[]
+
+  @@map("apps")
+}
+
+model AppApiKey {
+  id        String    @id @default(cuid())
+  appId     String
+  keyHash   String    @unique
+  label     String
+  scopes    String    @default("read,write")
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  app       App       @relation(fields: [appId], references: [id])
+
+  @@index([appId])
+  @@map("app_api_keys")
+}
+
+// ----------------------------------------------------------------------------
+// Identity (shared across all apps)
+// ----------------------------------------------------------------------------
+model User {
+  id        String   @id @default(cuid())
+  phone     String?  @unique
+  email     String?  @unique
+  fullName  String?
+  avatarUrl String?
+  locale    String   @default("ar")
+  country   String   @default("OM")
+  createdAt DateTime @default(now())
+
+  identities    UserIdentity[]
+  memberships   AppMembership[]
+  sessions      Session[]
+  subscriptions Subscription[]
+  payments      Payment[]
+  entitlements  Entitlement[]
+  referralCodes ReferralCode[]
+  bookings      Booking[]
+  assessments   Assessment[]
+  devPlans      DevPlan[]
+  challenges    Challenge[]
+  dailyTasks    DailyTask[]
+  messages      Message[]
+  pointsLedger  PointsLedger[]
+
+  @@map("users")
+}
+
+model UserIdentity {
+  id          String   @id @default(cuid())
+  userId      String
+  provider    String // apple | google | otp | password
+  providerUid String
+  email       String?
+  secretHash  String? // for password provider
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerUid])
+  @@index([userId])
+  @@map("user_identities")
+}
+
+model AppMembership {
+  id          String   @id @default(cuid())
+  userId      String
+  appId       String
+  role        String   @default("user") // user | trainer | org_admin
+  status      String   @default("active")
+  profileJson Json?
+  joinedAt    DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+  app         App      @relation(fields: [appId], references: [id])
+
+  @@unique([userId, appId])
+  @@index([appId])
+  @@map("app_memberships")
+}
+
+model Session {
+  id               String   @id @default(cuid())
+  userId           String
+  appId            String?
+  refreshTokenHash String   @unique
+  device           String?
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+  user             User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+// ----------------------------------------------------------------------------
+// Billing (per-app, provider-agnostic)
+// ----------------------------------------------------------------------------
+model Plan {
+  id           String   @id @default(cuid())
+  appId        String
+  code         String
+  nameAr       String
+  audience     String // individual | trainer_family | organization
+  priceMinor   Int // baisa
+  currency     String   @default("OMR")
+  interval     String   @default("month") // month | year
+  featuresJson Json?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  app          App      @relation(fields: [appId], references: [id])
+
+  subscriptions Subscription[]
+
+  @@unique([appId, code])
+  @@index([appId])
+  @@map("plans")
+}
+
+model Subscription {
+  id               String   @id @default(cuid())
+  appId            String
+  userId           String
+  planId           String
+  status           String   @default("trialing")
+  source           String   @default("manual") // apple | google | thawani | manual
+  storeTxnId       String?
+  currentPeriodEnd DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  app              App      @relation(fields: [appId], references: [id])
+  user             User     @relation(fields: [userId], references: [id])
+  plan             Plan     @relation(fields: [planId], references: [id])
+  payments         Payment[]
+
+  @@index([appId, userId])
+  @@map("subscriptions")
+}
+
+model Payment {
+  id             String        @id @default(cuid())
+  appId          String
+  userId         String
+  subscriptionId String?
+  orderId        String?
+  amountMinor    Int
+  currency       String        @default("OMR")
+  provider       String // apple | google | thawani | manual
+  providerRef    String?
+  status         String        @default("pending")
+  rawJson        Json?
+  createdAt      DateTime      @default(now())
+  app            App           @relation(fields: [appId], references: [id])
+  user           User          @relation(fields: [userId], references: [id])
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+
+  @@index([appId, userId])
+  @@map("payments")
+}
+
+model Entitlement {
+  id         String    @id @default(cuid())
+  appId      String
+  userId     String
+  featureKey String
+  source     String    @default("subscription")
+  expiresAt  DateTime?
+  createdAt  DateTime  @default(now())
+  app        App       @relation(fields: [appId], references: [id])
+  user       User      @relation(fields: [userId], references: [id])
+
+  @@unique([appId, userId, featureKey])
+  @@index([appId, userId])
+  @@map("entitlements")
+}
+
+model WebhookEvent {
+  id          String    @id @default(cuid())
+  provider    String
+  eventId     String
+  payloadJson Json
+  processedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@unique([provider, eventId])
+  @@map("webhook_events")
+}
+
+// ----------------------------------------------------------------------------
+// Referrals (per-app)
+// ----------------------------------------------------------------------------
+model ReferralCode {
+  id        String   @id @default(cuid())
+  appId     String
+  userId    String
+  code      String   @unique
+  createdAt DateTime @default(now())
+  app       App      @relation(fields: [appId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  redemptions ReferralRedemption[]
+
+  @@index([appId])
+  @@map("referral_codes")
+}
+
+model ReferralRedemption {
+  id             String   @id @default(cuid())
+  appId          String
+  codeId         String
+  referredUserId String
+  rewardStatus   String   @default("pending")
+  createdAt      DateTime @default(now())
+  code           ReferralCode @relation(fields: [codeId], references: [id])
+
+  @@index([appId])
+  @@map("referral_redemptions")
+}
+
+// ----------------------------------------------------------------------------
+// Catalog / commerce (per-app)
+// ----------------------------------------------------------------------------
+model CatalogItem {
+  id          String   @id @default(cuid())
+  appId       String
+  type        String // workshop | program | camp | course | product
+  section     String // training | self_dev | workshops | camps
+  titleAr     String
+  descAr      String?  @db.Text
+  coverUrl    String?
+  priceMinor  Int      @default(0)
+  currency    String   @default("OMR")
+  capacity    Int?
+  startsAt    DateTime?
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  app         App      @relation(fields: [appId], references: [id])
+
+  bookings      Booking[]
+  campSchedule  CampScheduleDay[]
+
+  @@index([appId, type])
+  @@map("catalog_items")
+}
+
+model Booking {
+  id        String   @id @default(cuid())
+  appId     String
+  userId    String
+  itemId    String
+  status    String   @default("reserved") // reserved | paid | attended | canceled
+  paymentId String?
+  createdAt DateTime @default(now())
+  app       App         @relation(fields: [appId], references: [id])
+  user      User        @relation(fields: [userId], references: [id])
+  item      CatalogItem @relation(fields: [itemId], references: [id])
+
+  @@index([appId, userId])
+  @@map("bookings")
+}
+
+model CampScheduleDay {
+  id        String   @id @default(cuid())
+  appId     String
+  campId    String
+  dayIndex  Int
+  titleAr   String
+  contentRef String?
+  unlockAt  DateTime?
+  camp      CatalogItem @relation(fields: [campId], references: [id])
+
+  @@index([campId])
+  @@map("camp_schedule")
+}
+
+// ----------------------------------------------------------------------------
+// Library (per-app)
+// ----------------------------------------------------------------------------
+model Coach {
+  id           String             @id @default(cuid())
+  appId        String
+  nameAr       String
+  bioAr        String?            @db.Text
+  avatarUrl    String?
+  specialtyAr  String?
+  email        String?
+  passwordHash String?
+  priceSAR     Float?
+  isActive     Boolean            @default(true)
+  createdAt    DateTime           @default(now())
+  app          App                @relation(fields: [appId], references: [id])
+  assets       LibraryAsset[]
+  sessions     ConsultSession[]
+  availability CoachAvailability[]
+
+  @@index([appId])
+  @@map("coaches")
+}
+
+model CoachAvailability {
+  id        String   @id @default(cuid())
+  coachId   String
+  dayOfWeek Int      // 0=Sun 1=Mon 2=Tue 3=Wed 4=Thu 5=Fri 6=Sat
+  slots     Json     // string[] e.g. ["09:00","10:00"]
+  coach     Coach    @relation(fields: [coachId], references: [id], onDelete: Cascade)
+
+  @@unique([coachId, dayOfWeek])
+  @@map("coach_availability")
+}
+
+model LibraryAsset {
+  id                  String   @id @default(cuid())
+  appId               String
+  coachId             String?
+  type                String // video | pdf | image | material
+  titleAr             String
+  descAr              String?  @db.Text
+  url                 String?
+  coverUrl            String?
+  duration            Int?
+  sizeBytes           Int?
+  requiredEntitlement String? // null = free
+  isDownloadable      Boolean  @default(false)
+  isPublished         Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  app                 App      @relation(fields: [appId], references: [id])
+  coach               Coach?   @relation(fields: [coachId], references: [id])
+
+  progress AssetProgress[]
+
+  @@index([appId, type])
+  @@map("library_assets")
+}
+
+model AssetProgress {
+  id          String    @id @default(cuid())
+  appId       String
+  userId      String
+  assetId     String
+  progressPct Int       @default(0)
+  completedAt DateTime?
+  asset       LibraryAsset @relation(fields: [assetId], references: [id])
+
+  @@unique([userId, assetId])
+  @@map("asset_progress")
+}
+
+// ----------------------------------------------------------------------------
+// AI Mentor (per-app)
+// ----------------------------------------------------------------------------
+model Assessment {
+  id         String   @id @default(cuid())
+  appId      String
+  userId     String
+  kind       String // personality | skills | learning_style
+  answersJson Json
+  resultJson Json?
+  createdAt  DateTime @default(now())
+  app        App      @relation(fields: [appId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@index([appId, userId])
+  @@map("assessments")
+}
+
+model DevPlan {
+  id               String   @id @default(cuid())
+  appId            String
+  userId           String
+  sourceAssessment String?
+  planJson         Json
+  status           String   @default("active")
+  createdAt        DateTime @default(now())
+  app              App      @relation(fields: [appId], references: [id])
+  user             User     @relation(fields: [userId], references: [id])
+
+  @@index([appId, userId])
+  @@map("dev_plans")
+}
+
+model Challenge {
+  id          String   @id @default(cuid())
+  appId       String
+  userId      String
+  kind        String // 30 | 90
+  goalAr      String
+  startDate   DateTime @default(now())
+  streakCount Int      @default(0)
+  status      String   @default("active")
+  app         App      @relation(fields: [appId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+
+  tasks DailyTask[]
+
+  @@index([appId, userId])
+  @@map("challenges")
+}
+
+model DailyTask {
+  id          String    @id @default(cuid())
+  appId       String
+  userId      String
+  challengeId String?
+  titleAr     String
+  dueDate     DateTime
+  status      String    @default("pending")
+  completedAt DateTime?
+  app         App        @relation(fields: [appId], references: [id])
+  user        User       @relation(fields: [userId], references: [id])
+  challenge   Challenge? @relation(fields: [challengeId], references: [id])
+
+  @@index([appId, userId])
+  @@map("daily_tasks")
+}
+
+model ConsultSession {
+  id          String   @id @default(cuid())
+  appId       String
+  userId      String
+  coachId     String
+  scheduledAt DateTime
+  durationMin Int      @default(30)
+  channel     String   @default("video")
+  status      String   @default("scheduled") // scheduled | confirmed | done | canceled
+  meetingUrl  String?
+  notesAr     String?  @db.Text
+  createdAt   DateTime @default(now())
+  app         App      @relation(fields: [appId], references: [id])
+  coach       Coach    @relation(fields: [coachId], references: [id])
+
+  @@index([appId, userId])
+  @@map("consult_sessions")
+}
+
+// ----------------------------------------------------------------------------
+// Notifications (per-app, per-user)
+// ----------------------------------------------------------------------------
+model Notification {
+  id        String   @id @default(cuid())
+  appId     String
+  userId    String
+  type      String   @default("info") // info | session | badge | task
+  titleAr   String
+  bodyAr    String   @db.Text
+  dataJson  Json?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  app       App      @relation(fields: [appId], references: [id])
+
+  @@index([appId, userId])
+  @@map("notifications")
+}
+
+// ----------------------------------------------------------------------------
+// Community (per-app)
+// ----------------------------------------------------------------------------
+model Room {
+  id       String   @id @default(cuid())
+  appId    String
+  nameAr   String
+  type     String   @default("public") // public | cohort | org
+  imageUrl String?
+  isActive Boolean  @default(true)
+  createdAt DateTime @default(now())
+  app      App      @relation(fields: [appId], references: [id])
+
+  members  RoomMember[]
+  messages Message[]
+
+  @@index([appId])
+  @@map("rooms")
+}
+
+model RoomMember {
+  id     String @id @default(cuid())
+  appId  String
+  roomId String
+  userId String
+  role   String @default("member")
+  room   Room   @relation(fields: [roomId], references: [id])
+
+  @@unique([roomId, userId])
+  @@map("room_members")
+}
+
+model Message {
+  id              String   @id @default(cuid())
+  appId           String
+  roomId          String
+  userId          String
+  body            String   @db.Text
+  attachmentsJson Json?
+  flagged         Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  app             App      @relation(fields: [appId], references: [id])
+  room            Room     @relation(fields: [roomId], references: [id])
+  user            User     @relation(fields: [userId], references: [id])
+
+  @@index([appId, roomId])
+  @@map("messages")
+}
+
+// ----------------------------------------------------------------------------
+// Gamification (per-app)
+// ----------------------------------------------------------------------------
+model PointsLedger {
+  id        String   @id @default(cuid())
+  appId     String
+  userId    String
+  delta     Int
+  reason    String
+  refId     String?
+  createdAt DateTime @default(now())
+  app       App      @relation(fields: [appId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([appId, userId])
+  @@map("points_ledger")
+}
+
+model Badge {
+  id      String @id @default(cuid())
+  appId   String
+  code    String
+  nameAr  String
+  iconUrl String?
+  app     App    @relation(fields: [appId], references: [id])
+
+  @@unique([appId, code])
+  @@map("badges")
+}
