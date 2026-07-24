@@ -2,7 +2,7 @@
 title: سياسات الخصوصية — منصة خلا
 ---
 
-<div dir="rtl" style="text-align:right;">
+<div dir="rtl" style="text-align:right;" markdown="1">
 
 # سياسات الخصوصية — منصة خلا (KHALA)
 

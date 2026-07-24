@@ -2,7 +2,7 @@
 title: سياسة الخصوصية — ولفة
 ---
 
-<div dir="rtl" style="text-align:right;">
+<div dir="rtl" style="text-align:right;" markdown="1">
 
 # سياسة الخصوصية — تطبيق ولفة (Walfa)
 
