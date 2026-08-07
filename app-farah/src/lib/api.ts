@@ -6,10 +6,7 @@ const extra = (Constants.expoConfig?.extra ?? {}) as {
   appKey?: string;
 };
 
-const BASE =
-  process.env.EXPO_PUBLIC_API_URL ??
-  extra.apiUrl ??
-  'http://localhost:4000/v1';
+const BASE = process.env.EXPO_PUBLIC_API_URL ?? extra.apiUrl ?? 'https://api.khalaapps.com/v1';
 
 const APP_KEY = extra.appKey ?? 'farah';
 

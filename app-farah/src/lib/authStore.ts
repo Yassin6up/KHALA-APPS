@@ -1,12 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const KEY_ACCESS = 'farah_access_token';
-const KEY_REFRESH = 'farah_refresh_token';
+const KEY_ACCESS = 'khala_access_token';
+const KEY_REFRESH = 'khala_refresh_token';
 
+// In-memory cache — fast synchronous reads after initial restore
 let _access: string | null = null;
 let _refresh: string | null = null;
 
 export const authStore = {
+  /** Call once on app startup to restore tokens from storage. */
   async restore(): Promise<void> {
     try {
       _access = await AsyncStorage.getItem(KEY_ACCESS);

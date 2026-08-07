@@ -1,12 +1,18 @@
 {
   "expo": {
-    "name": "فرح AI",
+    "name": "فرح",
     "slug": "farah",
     "scheme": "farah",
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "backgroundColor": "#FFF7FB",
+    "icon": "./assets/images/icon.jpeg",
+    "splash": {
+      "image": "./assets/images/splash.jpeg",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFF7FB"
+    },
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
@@ -17,11 +23,13 @@
     "android": {
       "package": "com.khala.farah",
       "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.jpeg",
         "backgroundColor": "#FFF7FB"
       }
     },
     "web": {
-      "bundler": "metro"
+      "bundler": "metro",
+      "favicon": "./assets/images/icon.jpeg"
     },
     "extra": {
       "apiUrl": "http://localhost:4000/v1",
@@ -31,7 +39,21 @@
       "expo-router",
       "expo-font",
       "expo-apple-authentication",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "يحتاج التطبيق للوصول لصورك لتحديث صورتك الشخصية."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#E8488B"
+        }
+      ],
+      "expo-av",
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true

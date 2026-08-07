@@ -27,6 +27,8 @@ export default function TabsLayout() {
       <Tabs.Screen name="marketplace" options={{ title: 'السوق', tabBarIcon: (p) => <TabIcon icon={Store} focused={p.focused} /> }} />
       <Tabs.Screen name="community" options={{ title: 'المجتمع', tabBarIcon: (p) => <TabIcon icon={Users} focused={p.focused} /> }} />
       <Tabs.Screen name="profile" options={{ title: 'حسابي', tabBarIcon: (p) => <TabIcon icon={UserIcon} focused={p.focused} /> }} />
+      <Tabs.Screen name="mentor" options={{ href: null }} />
+      <Tabs.Screen name="library" options={{ href: null }} />
     </Tabs>
   );
 }

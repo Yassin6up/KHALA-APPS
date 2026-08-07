@@ -6,7 +6,11 @@ module.exports = {
   ...base.expo,
   extra: {
     ...base.expo.extra,
-    apiUrl: process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000/v1',
+    apiUrl: process.env.EXPO_PUBLIC_API_URL ?? 'https://api.khalaapps.com/v1',
     appKey: 'farah',
+    stripePublishableKey: process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '',
+    eas: {
+      projectId: '26903dce-0bf8-4e12-ae11-6234e3115e3c',
+    },
   },
 };

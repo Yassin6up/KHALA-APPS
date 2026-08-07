@@ -34,7 +34,7 @@ export default function Occasions() {
         <Text style={styles.secTitle}>أدوات الذكاء الاصطناعي</Text>
         <View style={{ gap: 10, paddingHorizontal: spacing.lg }}>
           {AI_FEATURES.map((f) => (
-            <View key={f.key} style={styles.aiRow}>
+            <Pressable key={f.key} onPress={() => router.push(f.route as never)} style={styles.aiRow}>
               <ChevronLeft size={17} color={colors.textLo} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.aiTitle}>{f.title}</Text>
@@ -44,7 +44,7 @@ export default function Occasions() {
               <LinearGradient colors={f.gradient} style={styles.aiIcon} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
                 <f.icon size={20} color="#fff" />
               </LinearGradient>
-            </View>
+            </Pressable>
           ))}
         </View>
 

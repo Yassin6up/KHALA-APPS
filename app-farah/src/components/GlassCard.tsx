@@ -1,6 +1,7 @@
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { colors, radii } from '../theme';
 
-/** Minimal white card with clean border — no color tinting. */
+/** Clean white card with subtle elevation. */
 export function GlassCard({
   children,
   style,
@@ -10,20 +11,26 @@ export function GlassCard({
   style?: StyleProp<ViewStyle>;
   intensity?: number;
 }) {
-  return <View style={[styles.card, style]}>{children}</View>;
+  return (
+    <View style={[styles.card, style]}>
+      {children}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    backgroundColor: colors.bg1,
+    borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.07)',
+    borderColor: colors.glassBorder,
     padding: 18,
-    shadowColor: '#000',
+    // iOS shadow
+    shadowColor: '#0D1B2A',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
+    shadowOpacity: 0.07,
+    shadowRadius: 14,
+    // Android elevation
     elevation: 2,
   },
 });

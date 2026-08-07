@@ -2,7 +2,7 @@ import {
   Heart, Gem, Users, Cake, Baby, GraduationCap, Trophy, Briefcase,
   Plane, Flag, HeartHandshake, Sparkles, Box, TrendingDown, Search, Mail,
   PlaneTakeoff, Gift, Film, BookOpen, Music, Image as ImageIcon, Building2,
-  Hotel, Camera, Palette, UtensilsCrossed, Flower2, Speaker,
+  Hotel, Camera, Palette, UtensilsCrossed, Flower2, Speaker, Shirt,
 } from 'lucide-react-native';
 
 export type Occasion = {
@@ -36,15 +36,16 @@ export type AiFeature = {
   desc: string;
   icon: React.FC<any>;
   gradient: readonly [string, string];
+  route: string;
 };
 
 export const AI_FEATURES: AiFeature[] = [
-  { key: 'designer', title: 'مصمم المناسبات', trademark: 'AI Event Designer™', desc: 'صمّم مناسبتك كاملة من وصف بسيط: الفكرة، الألوان، الديكور، الموسيقى والبرنامج.', icon: Sparkles, gradient: ['#E8488B', '#7C3AED'] },
-  { key: 'twin', title: 'التوأم الرقمي', trademark: 'Digital Celebration Twin™', desc: 'نسخة ثلاثية الأبعاد للمناسبة تتجول داخلها وتعدّل التفاصيل قبل التنفيذ.', icon: Box, gradient: ['#7C3AED', '#A855F7'] },
-  { key: 'budget', title: 'محسّن الميزانية', trademark: 'AI Budget Optimizer™', desc: 'ميزانية مثالية وبدائل ذكية توفّر من ١٠٪ إلى ٤٠٪ مع الحفاظ على الجودة.', icon: TrendingDown, gradient: ['#F5B301', '#E8488B'] },
-  { key: 'vendor', title: 'مطابقة المورّدين', trademark: 'Smart Vendor Match™', desc: 'يقارن آلاف المورّدين ويختار الأنسب حسب السعر والجودة والموقع والتقييم.', icon: Search, gradient: ['#0EA5E9', '#7C3AED'] },
-  { key: 'invite', title: 'مولّد الدعوات', trademark: 'AI Invitation Generator™', desc: 'دعوات رقمية وفيديوهات وQR وتأكيد حضور وتذكيرات تلقائية خلال ثوانٍ.', icon: Mail, gradient: ['#EC4899', '#F5B301'] },
-  { key: 'welcome', title: 'مخطّط الاستقبال', trademark: 'AI Welcome Planner™', desc: 'تخطيط حفلات استقبال الحجّاج والمعتمرين والمسافرين بكل تفاصيلها.', icon: PlaneTakeoff, gradient: ['#10B981', '#0EA5E9'] },
+  { key: 'designer', title: 'مصمم المناسبات', trademark: 'AI Event Designer™', desc: 'صمّم مناسبتك كاملة من وصف بسيط: الفكرة، الألوان، الديكور، الموسيقى والبرنامج.', icon: Sparkles, gradient: ['#E8488B', '#7C3AED'], route: '/(tabs)/occasions' },
+  { key: 'invite', title: 'مولّد الدعوات', trademark: 'AI Invitation Generator™', desc: 'دعوة إلكترونية بموقع خاص وعدّ تنازلي ورابط جاهز للمشاركة خلال ثوانٍ.', icon: Mail, gradient: ['#EC4899', '#F5B301'], route: '/invitations' },
+  { key: 'budget', title: 'محسّن الميزانية', trademark: 'AI Budget Optimizer™', desc: 'ميزانية مثالية وبدائل ذكية توفّر من ١٠٪ إلى ٤٠٪ مع الحفاظ على الجودة.', icon: TrendingDown, gradient: ['#F5B301', '#E8488B'], route: '/budget' },
+  { key: 'welcome', title: 'مخطّط الاستقبال', trademark: 'AI Welcome Planner™', desc: 'تخطيط حفلات استقبال الحجّاج والمعتمرين والمسافرين بكل تفاصيلها.', icon: PlaneTakeoff, gradient: ['#10B981', '#0EA5E9'], route: '/welcome-planner' },
+  { key: 'vendor', title: 'مطابقة المورّدين', trademark: 'Smart Vendor Match™', desc: 'يقارن آلاف المورّدين ويختار الأنسب حسب السعر والجودة والموقع والتقييم.', icon: Search, gradient: ['#0EA5E9', '#7C3AED'], route: '/(tabs)/marketplace' },
+  { key: 'twin', title: 'التوأم الرقمي', trademark: 'Digital Celebration Twin™', desc: 'نسخة ثلاثية الأبعاد للمناسبة تتجول داخلها وتعدّل التفاصيل قبل التنفيذ.', icon: Box, gradient: ['#7C3AED', '#A855F7'], route: '/chat' },
 ];
 
 export type MemoryType = { key: string; title: string; desc: string; icon: React.FC<any>; tint: string };
@@ -63,6 +64,35 @@ export const MARKET_CATS: MarketCat[] = [
   { key: 'decor', title: 'الديكور', icon: Palette, tint: '#F5B301' },
   { key: 'catering', title: 'الضيافة', icon: UtensilsCrossed, tint: '#10B981' },
   { key: 'gifts', title: 'الورود والهدايا', icon: Flower2, tint: '#EC4899' },
+  { key: 'costumes', title: 'الأزياء', icon: Shirt, tint: '#F97316' },
   { key: 'production', title: 'الصوت والإضاءة', icon: Speaker, tint: '#8B5CF6' },
   { key: 'more', title: 'المزيد', icon: Gift, tint: '#F59E0B' },
+];
+
+/** Invitation event types + per-type field labels. */
+export type InviteType = {
+  key: string;
+  title: string;
+  icon: React.FC<any>;
+  tint: string;
+  hostALabel: string;
+  hostBLabel?: string;
+};
+
+export const INVITE_TYPES: InviteType[] = [
+  { key: 'wedding', title: 'حفل زفاف', icon: Heart, tint: '#E8488B', hostALabel: 'اسم العريس', hostBLabel: 'اسم العروس' },
+  { key: 'engagement', title: 'خطوبة وملكة', icon: Gem, tint: '#C026D3', hostALabel: 'اسم الخاطب', hostBLabel: 'اسم المخطوبة' },
+  { key: 'group_wedding', title: 'زواج جماعي', icon: Users, tint: '#10B981', hostALabel: 'الجهة المنظمة / العائلة' },
+  { key: 'babyshower', title: 'بيبي شاور', icon: Baby, tint: '#60A5FA', hostALabel: 'اسم الأم / اسم المولود' },
+  { key: 'birthday', title: 'عيد ميلاد', icon: Cake, tint: '#F5B301', hostALabel: 'اسم صاحب العيد' },
+];
+
+/** Invitation template previews (mirror API templates). */
+export type InviteTemplate = { key: string; title: string; bg: string; accent: string; ink: string; dark?: boolean };
+export const INVITE_TEMPLATES: InviteTemplate[] = [
+  { key: 'royal_gold', title: 'الذهب الملكي', bg: '#FDF8EE', accent: '#B8860B', ink: '#3D2E12' },
+  { key: 'blush_floral', title: 'الوردة الناعمة', bg: '#FFF5F9', accent: '#D6427F', ink: '#4A2338' },
+  { key: 'midnight_luxe', title: 'ليل فاخر', bg: '#141936', accent: '#E4C465', ink: '#F3EFE2', dark: true },
+  { key: 'arabic_classic', title: 'التراث الأندلسي', bg: '#F4F7F2', accent: '#1E6B45', ink: '#1F3A2A' },
+  { key: 'modern_minimal', title: 'عصري بسيط', bg: '#FBFBFA', accent: '#111111', ink: '#232323' },
 ];

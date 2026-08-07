@@ -83,9 +83,9 @@ export default function Profile() {
         {/* Stats row */}
         <View style={styles.statsCard}>
           {[
-            { icon: ShoppingBag, val: stats ? String(stats.orders) : '–', label: 'طلبات', color: colors.brand },
+            { icon: ShoppingBag, val: stats ? String(stats.orders ?? 0) : '–', label: 'طلبات', color: colors.brand },
             { icon: Award, val: String(badges.filter((b) => b.earned).length), label: 'أوسمة', color: colors.gold },
-            { icon: CalendarHeart, val: stats ? String(stats.messages) : '–', label: 'رسائل', color: colors.brand2 },
+            { icon: CalendarHeart, val: stats ? String(stats.messages ?? 0) : '–', label: 'رسائل', color: colors.brand2 },
           ].map((s, i) => (
             <View key={s.label} style={[styles.stat, i > 0 && styles.statBorder]}>
               <View style={[styles.statIcon, { backgroundColor: s.color + '18' }]}>

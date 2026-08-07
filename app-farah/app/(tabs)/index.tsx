@@ -82,14 +82,14 @@ export default function Home() {
         <SectionHead title="ذكاء فرح الاصطناعي" />
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hStrip}>
           {AI_FEATURES.map((f) => (
-            <View key={f.key} style={styles.aiCard}>
+            <Pressable key={f.key} onPress={() => router.push(f.route as never)} style={styles.aiCard}>
               <LinearGradient colors={f.gradient} style={styles.aiIcon} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
                 <f.icon size={20} color="#fff" />
               </LinearGradient>
               <Text style={styles.aiTitle}>{f.title}</Text>
               <Text style={styles.aiTm}>{f.trademark}</Text>
               <Text style={styles.aiDesc} numberOfLines={3}>{f.desc}</Text>
-            </View>
+            </Pressable>
           ))}
         </ScrollView>
 
