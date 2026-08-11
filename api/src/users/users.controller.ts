@@ -69,6 +69,9 @@ export class UsersController {
   async deleteMe(@CurrentUser() userId: string) {
     // Revoke all sessions first
     await this.prisma.session.deleteMany({ where: { userId } });
+    // Drop the login identities too — they hold the email and password hash, so
+    // leaving them behind would let a "deleted" account sign straight back in.
+    await this.prisma.userIdentity.deleteMany({ where: { userId } });
     // Soft-delete: anonymise user data
     const anon = `deleted_${userId.slice(0, 8)}`;
     await this.prisma.user.update({
