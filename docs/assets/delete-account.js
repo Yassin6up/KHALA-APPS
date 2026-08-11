@@ -34,6 +34,16 @@
 
   var $ = function (id) { return document.getElementById(id); };
 
+  /**
+   * Attaching listeners through this means a single missing element can never
+   * take the rest of the page down with it — a stale cached copy of this file
+   * against newer HTML once left the delete button permanently disabled.
+   */
+  function on(id, event, handler) {
+    var el = $(id);
+    if (el) el.addEventListener(event, handler);
+  }
+
   // ── Branding ──────────────────────────────────────────────
   document.documentElement.style.setProperty('--brand', app.brand);
   document.documentElement.style.setProperty('--brand2', app.brand2);
@@ -86,7 +96,7 @@
   }
 
   // ── Step 1: sign in ───────────────────────────────────────
-  $('loginForm').addEventListener('submit', function (e) {
+  on('loginForm', 'submit', function (e) {
     e.preventDefault();
     setError('');
 
@@ -127,13 +137,15 @@
 
   // ── Step 2: confirm, then delete ──────────────────────────
   function confirmationReady() {
-    return $('confirmCheck').checked;
+    var chk = $('confirmCheck');
+    return !chk || chk.checked;
   }
 
   function refreshDeleteBtn() { $('deleteBtn').disabled = !confirmationReady(); }
-  $('confirmCheck').addEventListener('change', refreshDeleteBtn);
+  on('confirmCheck', 'change', refreshDeleteBtn);
+  refreshDeleteBtn();
 
-  $('deleteBtn').addEventListener('click', function () {
+  on('deleteBtn', 'click', function () {
     if (!confirmationReady()) return;
     setError('');
 
@@ -159,10 +171,11 @@
       });
   });
 
-  $('cancelBtn').addEventListener('click', function () {
+  on('cancelBtn', 'click', function () {
     token = null;
     account = null;
-    $('confirmCheck').checked = false;
+    var chk = $('confirmCheck');
+    if (chk) chk.checked = false;
     refreshDeleteBtn();
     setError('');
     show('stepLogin');

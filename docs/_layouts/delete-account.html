@@ -6,7 +6,7 @@
 <meta name="robots" content="index, follow">
 <title>حذف الحساب — {{ page.app_name }}</title>
 <meta name="description" content="صفحة حذف الحساب وبياناته لتطبيق {{ page.app_name }} من منصة خلا. سجّل الدخول واحذف حسابك نهائياً بضغطة واحدة.">
-<link rel="stylesheet" href="../../assets/delete-account.css">
+<link rel="stylesheet" href="../../assets/delete-account.css?v=2">
 </head>
 <body data-app="{{ page.app }}">
 
@@ -117,6 +117,8 @@
 
 </div>
 
-<script src="../../assets/delete-account.js"></script>
+<!-- The ?v= is bumped whenever the CSS/JS changes: GitHub Pages serves assets
+     with max-age=600, and a stale script against newer markup breaks the page. -->
+<script src="../../assets/delete-account.js?v=2"></script>
 </body>
 </html>
