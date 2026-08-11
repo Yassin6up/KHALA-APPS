@@ -127,13 +127,11 @@
 
   // ── Step 2: confirm, then delete ──────────────────────────
   function confirmationReady() {
-    var typed = $('confirmWord').value.trim().toLowerCase();
-    return $('confirmCheck').checked && (typed === 'حذف' || typed === 'delete');
+    return $('confirmCheck').checked;
   }
 
   function refreshDeleteBtn() { $('deleteBtn').disabled = !confirmationReady(); }
   $('confirmCheck').addEventListener('change', refreshDeleteBtn);
-  $('confirmWord').addEventListener('input', refreshDeleteBtn);
 
   $('deleteBtn').addEventListener('click', function () {
     if (!confirmationReady()) return;
@@ -165,7 +163,6 @@
     token = null;
     account = null;
     $('confirmCheck').checked = false;
-    $('confirmWord').value = '';
     refreshDeleteBtn();
     setError('');
     show('stepLogin');
