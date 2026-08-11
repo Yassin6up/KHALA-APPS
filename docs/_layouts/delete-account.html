@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index, follow">
+<title>حذف الحساب — {{ page.app_name }}</title>
+<meta name="description" content="صفحة حذف الحساب وبياناته لتطبيق {{ page.app_name }} من منصة خلا. سجّل الدخول واحذف حسابك نهائياً بضغطة واحدة.">
+<link rel="stylesheet" href="../../assets/delete-account.css">
+</head>
+<body data-app="{{ page.app }}">
+
+<div class="wrap">
+
+  <header class="head">
+    <img id="logo" class="logo" src="" alt="">
+    <h1 class="app-name" id="appName"></h1>
+    <p class="page-name">حذف الحساب وجميع بياناته · Delete your account</p>
+  </header>
+
+  <div id="error" class="banner banner-error hidden"></div>
+
+  <!-- ── STEP 1: SIGN IN ─────────────────────────────────── -->
+  <section id="stepLogin" class="card">
+    <h2>سجّل الدخول لحذف حسابك</h2>
+    <p>لحمايتك، نطلب تسجيل الدخول للتأكد من أنك صاحب الحساب. استخدم نفس البريد الإلكتروني وكلمة المرور اللذين تستخدمهما في التطبيق.</p>
+
+    <form id="loginForm" autocomplete="on">
+      <div class="field">
+        <label for="email">البريد الإلكتروني</label>
+        <input type="email" id="email" name="email" autocomplete="email" required dir="ltr" placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label for="password">كلمة المرور</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required dir="ltr" placeholder="••••••••">
+      </div>
+      <button type="submit" id="loginBtn" class="btn-primary">تسجيل الدخول</button>
+    </form>
+
+    <p class="muted" style="margin-top:14px">
+      لا نحتفظ بكلمة المرور، وتُستخدم فقط للتحقق من هويتك عبر اتصال مشفّر مع خوادم {{ page.app_name }}.
+    </p>
+  </section>
+
+  <!-- ── STEP 2: CONFIRM ─────────────────────────────────── -->
+  <section id="stepConfirm" class="card hidden">
+    <h2>تأكيد حذف الحساب</h2>
+
+    <div class="account-box">
+      <div class="account-row"><span>الاسم</span><span id="accName">—</span></div>
+      <div class="account-row"><span>البريد الإلكتروني</span><span id="accEmail">—</span></div>
+    </div>
+
+    <div class="banner banner-warn">
+      <strong>تحذير: هذا الإجراء فوري ونهائي.</strong><br>
+      بمجرد الضغط على زر الحذف يتم تنفيذ الطلب مباشرة، ولا يمكن استرجاع الحساب أو أي من بياناته بعد ذلك.
+    </div>
+
+    <h3>ما الذي يُحذف فوراً؟</h3>
+    <ul>
+      <li>اسمك، وبريدك الإلكتروني، ورقم هاتفك، وصورة حسابك.</li>
+      <li>جميع جلسات الدخول على كل أجهزتك (تسجيل خروج فوري).</li>
+      <li>ملفك الشخصي داخل التطبيق ولن تتمكن من الدخول إليه مرة أخرى.</li>
+    </ul>
+
+    <h3>ما الذي قد نحتفظ به؟</h3>
+    <ul>
+      <li>سجلات مالية مجهولة الهوية (فواتير واشتراكات) للمدة التي يفرضها النظام المحاسبي والضريبي.</li>
+      <li>بيانات استخدام مجمّعة ومجهولة الهوية لا يمكن ربطها بك بأي شكل.</li>
+    </ul>
+
+    <label class="check">
+      <input type="checkbox" id="confirmCheck">
+      <span>أفهم أن حسابي وبياناتي الشخصية ستُحذف فوراً ونهائياً، ولا يمكن استرجاعها.</span>
+    </label>
+
+    <div class="field">
+      <label for="confirmWord">اكتب كلمة <strong>حذف</strong> للتأكيد</label>
+      <input type="text" id="confirmWord" autocomplete="off" placeholder="حذف">
+    </div>
+
+    <button type="button" id="deleteBtn" class="btn-danger" disabled>حذف حسابي نهائياً</button>
+    <button type="button" id="cancelBtn" class="btn-ghost">إلغاء والرجوع</button>
+  </section>
+
+  <!-- ── STEP 3: DONE ────────────────────────────────────── -->
+  <section id="stepDone" class="card hidden">
+    <div class="success-mark">✓</div>
+    <h2 style="text-align:center">تم حذف حسابك</h2>
+    <div class="banner banner-ok" style="margin-top:14px">
+      تم حذف الحساب المرتبط بـ <strong id="doneEmail"></strong> وجميع بياناته الشخصية من {{ page.app_name }} نهائياً، وتم تسجيل خروجك من كل الأجهزة.
+    </div>
+    <p>وصل إشعار بطلبك إلى فريق خلا، ولم يعد بإمكانك تسجيل الدخول بهذا الحساب. يمكنك حذف التطبيق من جهازك الآن.</p>
+    <p class="muted">لأي استفسار: <a href="mailto:privacy@khalaapps.com" style="color:var(--brand)">privacy@khalaapps.com</a></p>
+  </section>
+
+  <!-- ── English summary for reviewers ───────────────────── -->
+  <section class="card">
+    <div class="ltr">
+      <h3 style="margin-top:0">Account deletion — {{ page.app_name_en }}</h3>
+      <p>Sign in above with your {{ page.app_name_en }} email and password, then confirm to delete your account. Deletion is immediate and cannot be undone.</p>
+      <p style="margin-bottom:6px"><strong>Deleted immediately:</strong></p>
+      <ul>
+        <li>Name, email address, phone number and profile photo</li>
+        <li>All active sessions on every device</li>
+        <li>Access to the account — sign-in is no longer possible</li>
+      </ul>
+      <p style="margin-bottom:6px"><strong>Retained:</strong> anonymised billing records for the period required by law, and aggregated anonymous usage statistics that cannot be linked back to you.</p>
+      <p>No app installation is required to use this page. Questions: <a href="mailto:privacy@khalaapps.com" style="color:var(--brand)">privacy@khalaapps.com</a></p>
+    </div>
+  </section>
+
+  <footer>
+    <a href="../../privacy/{{ page.app }}">سياسة الخصوصية</a>
+    &nbsp;·&nbsp;
+    <a href="../">كل التطبيقات</a>
+    &nbsp;·&nbsp;
+    منصة خلا (KHALA)
+  </footer>
+
+</div>
+
+<script src="../../assets/delete-account.js"></script>
+</body>
+</html>
